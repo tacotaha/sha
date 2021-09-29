@@ -10,8 +10,9 @@
 
 #include "sha.h"
 #include "sha256.h"
+#include "sha512.h"
 
-#define ITER 1000
+#define ITER 10000
 #define NTHREADS 10
 
 typedef struct hr_args_t {
@@ -102,7 +103,6 @@ void test_sha(){
   }
 }
 
-
 void test_sha256(){
   int len;
   uchar_t *msg, d1[SHA256_DIGEST_LEN], d2[SHA256_DIGEST_LEN];
@@ -131,11 +131,40 @@ void test_sha256(){
   }
 }
 
+void test_sha512(){
+  int len;
+  uchar_t *msg, d1[SHA512_DIGEST_LEN], d2[SHA512_DIGEST_LEN];
+
+  for (int i = 0; i < ITER; ++i) {
+    len = rand() % (1 << 20);
+    if (!(msg = malloc(len)))
+      return;
+
+    get_rand_bytes(msg, len);
+    sha512(msg, len, d1);
+    SHA512(msg, len, d2);
+
+    printf("d1: ");
+    for (int i = 0; i < SHA512_DIGEST_LEN; ++i)
+      printf("%02x ", d1[i]);
+    printf("\n");
+
+    printf("d2: ");
+    for (int i = 0; i < SHA512_DIGEST_LEN; ++i)
+      printf("%02x ", d2[i]);
+    printf("\n");
+
+    assert(memcmp(d1, d2, SHA512_DIGEST_LEN) == 0);
+    free(msg);
+  }
+}
+
 int main() {
   srand(time(0));
 
   test_sha();
   test_sha256();
+  test_sha512();
   test_hash_rate(1 << 10, 1 << 20);
 
   return 0;

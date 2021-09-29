@@ -8,7 +8,7 @@ uchar_t *pad_msg(const uchar_t * msg, uint64_t len, uint64_t * padlen) {
   uchar_t *res = NULL;
   uint64_t pad, blen = len << 3;
 
-  pad = (blen >= 448) ? BLK_SIZE - ((blen - 448) % BLK_SIZE) : 448 - blen;
+  pad = (blen >= 448) ? 512 - ((blen - 448) % 512) : 448 - blen;
   *padlen = (blen + pad + 65) >> 3;
   res = calloc(1, *padlen);
 
@@ -25,7 +25,7 @@ uchar_t *pad_msg(const uchar_t * msg, uint64_t len, uint64_t * padlen) {
 uint32_t *get_msg_sched(uchar_t * msg_blk) {
   uint32_t w, *msg_sched = calloc(1, sizeof(uint32_t) * 80);
   if (msg_sched) {
-    for (int i = 0; i < BLK_SIZE >> 3; i += 4) {
+    for (int i = 0; i < 64; i += 4) {
       msg_sched[i / 4] = msg_blk[i + 3];
       msg_sched[i / 4] |= (msg_blk[i + 2] << 8);
       msg_sched[i / 4] |= (msg_blk[i + 1] << 16);

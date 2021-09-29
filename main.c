@@ -3,10 +3,11 @@
 
 #include "sha.h"
 #include "sha256.h"
+#include "sha512.h"
 
 int main() {
-  uchar_t sha1sum[SHA_DIGEST_LEN], sha256sum[SHA256_DIGEST_LEN];
   const char *msg = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+  uchar_t sha1sum[SHA_DIGEST_LEN], sha256sum[SHA512_DIGEST_LEN], sha512sum[SHA512_DIGEST_LEN];
 
   sha_ctx_t c;
   sha_init(&c);
@@ -26,6 +27,16 @@ int main() {
   printf("SHA256 Digest: ");
   for (int i = 0; i < SHA256_DIGEST_LEN; ++i)
     printf("%02x ", sha256sum[i]);
+  printf("\n");
+
+  sha512_ctx_t c512;
+  sha512_init(&c512);
+  sha512_update(&c512, (uchar_t *) msg, strlen(msg));
+  sha512_final(&c512, sha512sum);
+
+  printf("SHA512 Digest: ");
+  for (int i = 0; i < SHA512_DIGEST_LEN; ++i)
+    printf("%02x ", sha512sum[i]);
   printf("\n");
 
   return 0;
