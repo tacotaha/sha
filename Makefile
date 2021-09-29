@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror -std=c99 -pedantic -g
+CFLAGS=-Wall -Werror -std=c99 -pedantic -O3 #-g
 OBJ=sha.o
 EXEC=sha test
 
@@ -9,7 +9,7 @@ sha: main.o $(OBJ)
 	$(CC) main.o $(OBJ) -o sha
 
 test: test.o $(OBJ)
-	$(CC) test.o $(OBJ) -lcrypto -o test
+	$(CC) test.o $(OBJ) -lcrypto -lpthread -o test
 
 main.o: main.c
 	$(CC) $(CFLAGS) -c main.c -o main.o
