@@ -9,6 +9,7 @@
 #include <pthread.h>
 
 #include "sha.h"
+#include "sha256.h"
 
 #define ITER 1000
 #define NTHREADS 10
@@ -32,9 +33,9 @@ int get_rand_bytes(uchar_t * buff, int size) {
 
 void *run_hr(void *args) {
   hr_args_t *h = (hr_args_t *) args;
-  uchar_t digest[SHA_DIGEST_LEN];
+  uchar_t digest[SHA256_DIGEST_LEN];
   while (!h->stop && ++h->count)
-    sha(h->msg, h->len, digest);
+    sha256(h->msg, h->len, digest);
   return NULL;
 }
 
@@ -73,16 +74,14 @@ int test_hash_rate(uint64_t msg_size, uint64_t nhashes) {
   return hr_args.count;
 }
 
-int main() {
+void test_sha(){
   int len;
   uchar_t *msg, d1[SHA_DIGEST_LEN], d2[SHA_DIGEST_LEN];
-
-  srand(time(0));
 
   for (int i = 0; i < ITER; ++i) {
     len = rand() % (1 << 20);
     if (!(msg = malloc(len)))
-      return 1;
+      return;
 
     get_rand_bytes(msg, len);
     sha(msg, len, d1);
@@ -101,7 +100,42 @@ int main() {
     assert(memcmp(d1, d2, SHA_DIGEST_LEN) == 0);
     free(msg);
   }
+}
 
+
+void test_sha256(){
+  int len;
+  uchar_t *msg, d1[SHA256_DIGEST_LEN], d2[SHA256_DIGEST_LEN];
+
+  for (int i = 0; i < ITER; ++i) {
+    len = rand() % (1 << 20);
+    if (!(msg = malloc(len)))
+      return;
+
+    get_rand_bytes(msg, len);
+    sha256(msg, len, d1);
+    SHA256(msg, len, d2);
+
+    printf("d1: ");
+    for (int i = 0; i < SHA256_DIGEST_LEN; ++i)
+      printf("%02x ", d1[i]);
+    printf("\n");
+
+    printf("d2: ");
+    for (int i = 0; i < SHA256_DIGEST_LEN; ++i)
+      printf("%02x ", d2[i]);
+    printf("\n");
+
+    assert(memcmp(d1, d2, SHA256_DIGEST_LEN) == 0);
+    free(msg);
+  }
+}
+
+int main() {
+  srand(time(0));
+
+  test_sha();
+  test_sha256();
   test_hash_rate(1 << 10, 1 << 20);
 
   return 0;

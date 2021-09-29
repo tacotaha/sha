@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -Werror -std=c99 -pedantic -O3 #-g
-OBJ=sha.o
+CFLAGS=-Wall -Werror -std=c99 -pedantic -O3 -march=native -mtune=native
+OBJ=rcons.o sha.o sha256.o
 EXEC=sha test
 
 all: $(EXEC)
@@ -17,8 +17,14 @@ main.o: main.c
 test.o: test.c
 	$(CC) $(CFLAGS) -c test.c -o test.o
 
+rcons.o: rcons.h rcons.c
+	$(CC) $(CFLAGS) -c rcons.c -o rcons.o
+
 sha.o: sha.h sha.c
 	$(CC) $(CFLAGS) -c sha.c -o sha.o
+
+sha256.o: sha256.h sha256.c
+	$(CC) $(CFLAGS) -c sha256.c -o sha256.o
 
 clean:
 	rm -f $(EXEC) *.o *~
